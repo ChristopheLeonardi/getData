@@ -10,33 +10,15 @@ function get_data(promises) {
   try {
     if (promises == undefined) { var promises = [] }
 
-    /*/////// CSV  //////*/
-    promises.push(
-      fetch('/ui/plug-in/integration/carte-instrument-musee/data/data-carte-collections_2023-07-20.csv.gz')
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`Erreur HTTP : ${response.status}`);
-          }
-          return response.arrayBuffer(); // Utilisez arrayBuffer pour récupérer les données brutes
-        })
-        .then(arrayBuffer => {
-          // Décompressez le contenu avec pako
-          const inflatedData = pako.inflate(new Uint8Array(arrayBuffer), { to: 'string' });
-
-          // Parsez le contenu décompressé en CSV avec d3
-          return d3.csvParse(inflatedData);
-        })
-    );
-
     /*/////// JSON  //////*/
-    const jsonUrls = [
+    const urls = [
       '/ui/plug-in/integration/carte-instrument-musee/data/amerique.json.gz',
       '/ui/plug-in/integration/carte-instrument-musee/data/reste.json.gz',
       '/ui/plug-in/integration/carte-instrument-musee/data/config.json.gz',
     ];
 
     // Utilisez une boucle pour charger et décompresser les fichiers JSON
-    for (const url of jsonUrls) {
+    for (const url of urls) {
       promises.push(
         fetch(url)
           .then(response => {
@@ -50,7 +32,10 @@ function get_data(promises) {
             const inflatedData = pako.inflate(new Uint8Array(arrayBuffer), { to: 'string' });
 
             // Parsez le contenu décompressé en tant qu'objet JSON
-            return JSON.parse(inflatedData);
+            return JSON.parse(inflatedData); 
+            
+            // Parsez le contenu décompressé en tant que csv
+            // return d3.csvParse(inflatedData);
           })
       );
     }
